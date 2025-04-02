@@ -11,7 +11,7 @@ postgresql:
     tag: 12.2
   auth:
     username: "affine"
-    password: "CHANGEME"
+    password: "a89sd7fasyuifioafafyiayfuiasf"
     database: "affine"
 
 affine:
@@ -35,6 +35,7 @@ affine:
   ingress:
     enabled: true
     annotations: {}
+    ingressClassName: nginx
     hosts:
       - host: affine.127.0.0.1.nip.io
         paths:
