@@ -11,7 +11,7 @@ postgresql:
     tag: 12.2
   auth:
     username: "affine"
-    password: "a89sd7fasyuifioafafyiayfuiasf"
+    password: "CHANGEME"
     database: "affine"
 
 affine:
