@@ -1,0 +1,17 @@
+{{- if .Values.affine.persistence.enabled -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "affine.fullname" . }}-pvc
+spec:
+  {{- if .Values.affine.persistence.storageClass }}
+  storageClassName: {{ .Values.affine.persistence.storageClass }}
+  {{- end }}
+  accessModes:
+    {{- range $accessMode := .Values.affine.persistence.accessModes }}
+    - {{ $accessMode }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.affine.persistence.size }}
+{{- end }}

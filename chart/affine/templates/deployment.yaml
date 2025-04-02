@@ -1,0 +1,143 @@
+{{- $fullName := include "affine.fullname" . -}}
+{{- $isPersistence := .Values.affine.persistence.enabled -}}
+{{- $existingClaim := .Values.affine.persistence.existingClaim -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "affine.fullname" . }}
+spec:
+  replicas: {{ .Values.affine.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ $fullName }}
+  template:
+    metadata:
+      {{- with .Values.affine.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "affine.labels" . | nindent 8 }}
+        {{- with .Values.affine.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        name: {{ $fullName }}
+    spec:
+      {{- with .Values.affine.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.affine.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox
+          command: [ 'sh', '-c', 'until nc -z {{ $fullName }}-postgresql-hl 5432; do echo waiting for subchart; sleep 5; done;' ]
+        - name: run-migrations
+          image: "{{ .Values.affine.image.repository }}:{{ .Values.affine.image.tag }}"
+          command:
+            - sh
+            - -c
+            - node ./scripts/self-host-predeploy.js
+          env:
+            {{- if .Values.postgresql.enabled }}
+            - name: DATABASE_URL
+              value: postgresql://{{.Values.postgresql.auth.username}}:{{.Values.postgresql.auth.password}}@{{$fullName}}-postgresql-hl:5432/{{.Values.postgresql.auth.database}}
+            {{- end }}
+            {{- range $key, $val := .Values.affine.env }}
+            - name: {{ $key }}
+              value: "{{ $val }}"
+            {{- end }}
+        {{ if .Values.affine.defaultOverrides.enabled }}
+        - name: patch-plan-data
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          command:
+            - bash
+            - -c
+            - |
+              set -e
+              psql -v ON_ERROR_STOP=1 "$DATABASE_URL" <<-EOSQL
+                UPDATE features SET configs = '{"name":"Pro","blobLimit":{{ .Values.affine.defaultOverrides.blobLimit }},"storageQuota":{{ .Values.affine.defaultOverrides.storageQuota }},"historyPeriod":{{ .Values.affine.defaultOverrides.historyPeriod }},"memberLimit":{{ .Values.affine.defaultOverrides.memberLimit }},"copilotActionLimit":{{ .Values.affine.defaultOverrides.copilotActionLimit }}}'::jsonb WHERE id=1;
+              EOSQL
+          env:
+            {{- if .Values.postgresql.enabled }}
+            - name: DATABASE_URL
+              value: postgresql://{{.Values.postgresql.auth.username}}:{{.Values.postgresql.auth.password}}@affine-postgresql:5432/{{.Values.postgresql.auth.database}}
+            {{- end }}
+            {{- range $key, $val := .Values.affine.env }}
+            - name: {{ $key }}
+              value: "{{ $val }}"
+            {{- end }}
+        {{ end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          args:
+            - node
+            - --import
+            - ./scripts/register.js
+            - ./dist/index.js
+          securityContext:
+            {{- toYaml .Values.affine.podSecurityContext | nindent 12 }}
+          image: "{{ .Values.affine.image.repository }}:{{ .Values.affine.image.tag }}"
+          imagePullPolicy: {{ .Values.affine.image.pullPolicy }}
+          ports:
+          {{- range $key, $val := .Values.affine.service.ports }}
+            - containerPort: {{ .port | default "80" }}
+              protocol: {{ .protocol | upper | default "TCP"}}
+          {{- end }}
+          env:
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_SERVER_HOST
+              value: {{$fullName}}-redis-headless
+            {{- end }}
+            {{- if .Values.postgresql.enabled }}
+            - name: DATABASE_URL
+              value: postgresql://{{.Values.postgresql.auth.username}}:{{.Values.postgresql.auth.password}}@{{$fullName}}-postgresql-hl:5432/{{.Values.postgresql.auth.database}}
+            {{- end }}
+            {{- range $key, $val := .Values.affine.env }}
+            - name: {{ $key }}
+              value: "{{ $val }}"
+            {{- end}}
+          {{- if .Values.affine.livenessProbe }}
+          livenessProbe:
+            {{- toYaml .Values.affine.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.affine.readinessProbe }}
+          readinessProbe:
+            {{- toYaml .Values.affine.readinessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.affine.resources | nindent 12 }}
+          {{- if or .Values.affine.persistence.enabled .Values.affine.volumeMounts}}
+          volumeMounts:
+          {{- if $isPersistence }}
+            - mountPath: {{.Values.affine.persistence.mountPath}}
+              name: {{ $fullName}}-storage
+          {{- end}}
+          {{- with .Values.affine.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end}}
+      {{- if or .Values.affine.persistence.enabled .Values.affine.volumes}}
+      volumes:
+        {{- if $isPersistence}}
+        - name: {{ $fullName}}-storage
+          persistentVolumeClaim:
+            claimName: {{ $existingClaim | default $fullName }}-pvc
+        {{- end }}
+        {{- with .Values.affine.volumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end}}
+      {{- with .Values.affine.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affine.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affine.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

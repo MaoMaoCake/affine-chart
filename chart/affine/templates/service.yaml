@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: {{ include "affine.fullname" . }}-service
+  name: {{ include "affine.fullname" . }}-service
+spec:
+  ports:
+    {{- range $servicePort := .Values.affine.service.ports }}
+    - port: {{ $servicePort.port }}
+      targetPort: {{ $servicePort.targetPort }}
+      name: {{ $servicePort.name | quote }}
+    {{- end }}
+  selector:
+    name: {{ include "affine.fullname" . }}

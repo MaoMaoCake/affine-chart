@@ -1,0 +1,91 @@
+redis:
+  enabled: true
+  auth:
+    enabled: false
+
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    pullPolicy: IfNotPresent
+    tag: 12.2
+  auth:
+    username: "affine"
+    password: "CHANGEME"
+    database: "affine"
+
+affine:
+  image:
+    repository: ghcr.io/toeverything/affine-graphql
+    pullPolicy: IfNotPresent
+    tag: stable-b427a89 # stable for 0.20.5 this image fixes the version
+
+  replicaCount: 1
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  livenessProbe: {}
+  readinessProbe: {}
+
+
+  ingress:
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: affine.127.0.0.1.nip.io
+        paths:
+          - path: /
+            pathType: Prefix
+            servicePort: 3010
+    tls: []
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  # todo add resource limits
+  resources: {}
+
+  # todo add autoscaling
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # todo override default limits
+  defaultOverrides:
+    enabled: true
+    blobLimit: 1048576000 # 100MB
+    storageQuota: 1073741824000 # 100GB
+    historyPeriod: 2592000000
+    memberLimit: 20 # default is only 10
+    copilotActionLimit: 100
+
+  persistence:
+    enabled: true
+    # storageClass: standard
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    existingClaim: ""
+    mountPath: /root/.affine
+
+  volumeMounts: []
+  volumes: []
+
+  service:
+    type: ClusterIP
+    ports:
+      - port: 3010
+        targetPort: 3010
+        protocol: TCP
+        name: http
+
+  env:
+    AFFINE_CONFIG_PATH: /root/.affine/config
+    AFFINE_UPLOAD_PATH: /root/.affine/upload
