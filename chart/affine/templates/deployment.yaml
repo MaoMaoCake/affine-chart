@@ -60,6 +60,10 @@ spec:
                 UPDATE features SET configs = '{"name":"Pro","blobLimit":{{ .Values.affine.defaultOverrides.blobLimit }},"storageQuota":{{ .Values.affine.defaultOverrides.storageQuota }},"historyPeriod":{{ .Values.affine.defaultOverrides.historyPeriod }},"memberLimit":{{ .Values.affine.defaultOverrides.memberLimit }},"copilotActionLimit":{{ .Values.affine.defaultOverrides.copilotActionLimit }}}'::jsonb WHERE id=1;
               EOSQL
           env:
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_SERVER_HOST
+              value: {{$fullName}}-redis-master
+                        {{- end }}
             {{- if .Values.postgresql.enabled }}
             - name: DATABASE_URL
               value: postgresql://{{.Values.postgresql.auth.username}}:{{.Values.postgresql.auth.password}}@{{$fullName}}-postgresql-hl:5432/{{.Values.postgresql.auth.database}}
@@ -88,7 +92,7 @@ spec:
           env:
             {{- if .Values.redis.enabled }}
             - name: REDIS_SERVER_HOST
-              value: {{$fullName}}-redis-headless
+              value: {{$fullName}}-redis-master
             {{- end }}
             {{- if .Values.postgresql.enabled }}
             - name: DATABASE_URL

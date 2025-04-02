@@ -23,8 +23,8 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.affine.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.affine.ingress.className }}
+  {{- if and .Values.affine.ingress.ingressClassName (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.affine.ingress.ingressClassName }}
   {{- end }}
   {{- if .Values.affine.ingress.tls }}
   tls:
