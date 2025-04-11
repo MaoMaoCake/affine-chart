@@ -90,3 +90,4 @@ affine:
   env:
     AFFINE_CONFIG_PATH: /root/.affine/config
     AFFINE_UPLOAD_PATH: /root/.affine/upload
+    AFFINE_SERVER_EXTERNAL_URL : https://affine.jirapongpansak.com
