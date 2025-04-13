@@ -50,7 +50,7 @@ spec:
             {{- end }}
         {{ if .Values.affine.defaultOverrides.enabled }}
         - name: patch-plan-data
-          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          image: "{{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
           command:
             - bash
             - -c

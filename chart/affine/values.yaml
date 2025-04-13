@@ -6,6 +6,7 @@ redis:
 postgresql:
   enabled: true
   image:
+    registry: docker.io
     repository: bitnami/postgres
     pullPolicy: IfNotPresent
     tag: 17.4.0-debian-12-r15
