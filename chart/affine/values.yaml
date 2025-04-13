@@ -18,7 +18,7 @@ affine:
   image:
     repository: ghcr.io/toeverything/affine-graphql
     pullPolicy: IfNotPresent
-    tag: stable-b427a89 # stable for 0.20.5 this image fixes the version
+    tag: stable-a166760 # stable for 0.21.2 this image fixes the version
 
   replicaCount: 1
   podAnnotations: {}
