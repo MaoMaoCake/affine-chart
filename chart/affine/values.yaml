@@ -58,7 +58,6 @@ affine:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
 
-  # todo override default limits
   defaultOverrides:
     enabled: true
     blobLimit: 1048576000 # 100MB
