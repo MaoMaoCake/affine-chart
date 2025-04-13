@@ -6,9 +6,9 @@ redis:
 postgresql:
   enabled: true
   image:
-    repository: postgres
+    repository: bitnami/postgres
     pullPolicy: IfNotPresent
-    tag: 12.2
+    tag: 17.4.0-debian-12-r15
   auth:
     username: "affine"
     password: "CHANGEME"
