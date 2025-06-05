@@ -40,9 +40,18 @@ spec:
             - -c
             - node ./scripts/self-host-predeploy.js
           env:
+            {{- if .Values.manticoresearch.enabled }}
+            - name: AFFINE_INDEXER_ENABLED
+              value: "True"
+            - name: AFFINE_INDEXER_SEARCH_ENDPOINT
+              value: http://{{ $fullName }}-manticoresearch-worker-svc:9308
+            {{- else}}
+            - name: AFFINE_INDEXER_ENABLED
+              value: "False"
+            {{- end }}
             {{- if .Values.redis.enabled }}
             - name: REDIS_SERVER_HOST
-              value: {{$fullName}}-redis-master
+              value: {{ $fullName }}-redis-master
                                     {{- end }}
             {{- if .Values.postgresql.enabled }}
             - name: DATABASE_URL
@@ -66,7 +75,7 @@ spec:
           env:
             {{- if .Values.redis.enabled }}
             - name: REDIS_SERVER_HOST
-              value: {{$fullName}}-redis-master
+              value: {{ $fullName }}-redis-master
                         {{- end }}
             {{- if .Values.postgresql.enabled }}
             - name: DATABASE_URL
@@ -89,6 +98,15 @@ spec:
               protocol: {{ .protocol | upper | default "TCP"}}
           {{- end }}
           env:
+            {{- if .Values.manticoresearch.enabled }}
+            - name: AFFINE_INDEXER_ENABLED
+              value: "True"
+            - name: AFFINE_INDEXER_SEARCH_ENDPOINT
+              value: http://{{ $fullName }}-manticoresearch-worker-svc:9308
+                        {{- else}}
+            - name: AFFINE_INDEXER_ENABLED
+              value: "False"
+            {{- end }}
             {{- if .Values.redis.enabled }}
             - name: REDIS_SERVER_HOST
               value: {{$fullName}}-redis-master

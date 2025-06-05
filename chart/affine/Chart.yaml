@@ -31,3 +31,7 @@ dependencies:
     version: 16.6.3
     repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
+  - name: manticoresearch
+    version: 9.3.2
+    repository: "https://helm.manticoresearch.com"
+    condition: manticoresearch.enabled

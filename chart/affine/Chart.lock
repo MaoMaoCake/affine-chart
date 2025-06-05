@@ -5,5 +5,8 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 16.6.3
-digest: sha256:d328b18c318bf5b71734235d6033bcd1fe94237daa6ab09b92a22e23c3d362de
-generated: "2025-04-13T19:28:11.431677374+07:00"
+- name: manticoresearch
+  repository: https://helm.manticoresearch.com
+  version: 9.3.2
+digest: sha256:025e002db2e276514c93515f01f24f9fb9d3cedd254f8a564ebcd502ff1ce244
+generated: "2025-06-05T11:49:34.22270928+07:00"

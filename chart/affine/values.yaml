@@ -15,6 +15,9 @@ postgresql:
     password: "CHANGEME"
     database: "affine"
 
+manticoresearch:
+  enabled: false
+
 affine:
   image:
     repository: ghcr.io/toeverything/affine-graphql
@@ -90,4 +93,3 @@ affine:
   env:
     AFFINE_CONFIG_PATH: /root/.affine/config
     AFFINE_UPLOAD_PATH: /root/.affine/upload
-    AFFINE_INDEXER_ENABLED: false # not sure yet why todo
