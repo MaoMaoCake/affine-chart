@@ -19,7 +19,7 @@ affine:
   image:
     repository: ghcr.io/toeverything/affine-graphql
     pullPolicy: IfNotPresent
-    tag: stable-f54bc0c # stable for 0.21.6 this image fixes the version
+    tag: stable-d219c92 # stable for 0.22.0 this image fixes the version
 
   replicaCount: 1
   podAnnotations: {}
@@ -90,3 +90,4 @@ affine:
   env:
     AFFINE_CONFIG_PATH: /root/.affine/config
     AFFINE_UPLOAD_PATH: /root/.affine/upload
+    AFFINE_INDEXER_ENABLED: false # not sure yet why todo

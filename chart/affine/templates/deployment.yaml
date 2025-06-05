@@ -40,6 +40,10 @@ spec:
             - -c
             - node ./scripts/self-host-predeploy.js
           env:
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_SERVER_HOST
+              value: {{$fullName}}-redis-master
+                                    {{- end }}
             {{- if .Values.postgresql.enabled }}
             - name: DATABASE_URL
               value: postgresql://{{.Values.postgresql.auth.username}}:{{.Values.postgresql.auth.password}}@{{$fullName}}-postgresql-hl:5432/{{.Values.postgresql.auth.database}}
